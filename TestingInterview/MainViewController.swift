@@ -25,8 +25,14 @@ class MainViewController: UIViewController {
         tF.delegate = self
         return tF
     }()
-    
-    // add a second textField here
+
+    lazy var secondWordTextField: UITextField = {
+        let tF = UITextField()
+        tF.placeholder = MainVCStrings.secondWordPlaceholder.rawValue
+        tF.borderStyle = .roundedRect
+        tF.delegate = self
+        return tF
+    }()
     
     var checkButton: UIButton = {
         let btn = UIButton()
@@ -63,11 +69,27 @@ class MainViewController: UIViewController {
         let tap = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
         view.addGestureRecognizer(tap)
     }
-    
-    // create function that checks if the second word is an anagram of
-    // the first word. This function should be called when the button is tapped.
-    
-    @objc func buttonTapped() {}
+
+    func checkForAnagram (firstWord: String, secondWord: String) -> Bool {
+
+        if firstWord == "" || secondWord == "" || firstWord == secondWord {
+            return false
+        }
+
+        let firstWordTrimmed = firstWord.trimmingCharacters(in: .whitespaces)
+        let secondWordTrimmed = secondWord.trimmingCharacters(in: .whitespaces)
+        return firstWordTrimmed.lowercased().sorted() == secondWordTrimmed.lowercased().sorted()
+    }
+
+    @objc func buttonTapped() {
+
+        if let firstWordTextField = firstWordTextField.text,
+            let secondWordTextField = secondWordTextField.text {
+
+            let isAnagram = checkForAnagram(firstWord:firstWordTextField, secondWord: secondWordTextField)
+            updateResultLabel(with: isAnagram)
+        }
+    }
     
     func updateResultLabel(with success: Bool) {
         let txt = success ? MainVCStrings.successLabel : MainVCStrings.failureLabel
@@ -111,7 +133,11 @@ extension MainViewController {
     }
     
     func layoutSecondWordTextField() {
-        // layout textField
+        view.addSubview(secondWordTextField)
+        secondWordTextField.translatesAutoresizingMaskIntoConstraints = false
+        secondWordTextField.topAnchor.constraint(equalTo: firstWordTextField.bottomAnchor, constant: 20).isActive = true
+        secondWordTextField.leadingAnchor.constraint(equalTo: firstWordTextField.leadingAnchor).isActive = true
+        secondWordTextField.trailingAnchor.constraint(equalTo: firstWordTextField.trailingAnchor).isActive = true
     }
     
     func layoutCheckButton() {
